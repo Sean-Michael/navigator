@@ -49,32 +49,36 @@ def guess_spec_sections(task: str) -> list[str]:
     return out
 
 
-def build_prompt(task: str, project: dict[str, Any], branch: str, spec_sections: list[str]) -> str:
+def build_prompt(
+    task: str, project: dict[str, Any], branch: str, spec_sections: list[str]
+) -> str:
     last = project["sessions"][0] if project["sessions"] else None
     last_line = (
-        f"- Last session ({last['date']}): {last['outcome']} — {last['task']}" if last else ""
+        f"- Last session ({last['date']}): {last['outcome']} — {last['task']}"
+        if last
+        else ""
     )
     sections = "\n".join(f"- {s}" for s in spec_sections)
     skills = "\n".join(f"- {s}" for s in project["skills"])
     worktree = f"{project['repoPath']}-{branch.replace('/', '-')}"
-    return f"""# Session Brief — {project['name']}
+    return f"""# Session Brief — {project["name"]}
 
 ## Task
 {task}
 
 ## Context
-- Project: {project['name']}
-- Repo: {project['repoPath']}
+- Project: {project["name"]}
+- Repo: {project["repoPath"]}
 - Worktree: {worktree}
 - Branch: {branch}
-- Stack: {project['description']}
+- Stack: {project["description"]}
 
 ## Relevant spec sections (SPEC.md)
 {sections}
 
 ## Recent activity
-- Last commit ({project['lastCommit']['sha']}): {project['lastCommit']['message']}
-- Open PRs: {project['openPRs']}
+- Last commit ({project["lastCommit"]["sha"]}): {project["lastCommit"]["message"]}
+- Open PRs: {project["openPRs"]}
 {last_line}
 
 ## Skills loaded
@@ -112,17 +116,17 @@ def build_resume_prompt(project: dict[str, Any]) -> str:
         else "- Overview"
     )
     skills = "\n".join(f"- {s}" for s in project["skills"])
-    return f"""# Resume Session — {project['name']}
+    return f"""# Resume Session — {project["name"]}
 
 ## Picking up on branch
-{project['branch']}
+{project["branch"]}
 
 ## What was last done
 {what}
 
 ## Current repo state
-- Last commit ({project['lastCommit']['sha']}): {project['lastCommit']['message']}
-- Open PRs: {project['openPRs']}
+- Last commit ({project["lastCommit"]["sha"]}): {project["lastCommit"]["message"]}
+- Open PRs: {project["openPRs"]}
 
 ## Open TODOs in code
 {todos}

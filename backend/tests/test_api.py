@@ -44,7 +44,9 @@ def test_feed_and_ready_and_stats(client: TestClient) -> None:
 
 
 def test_delegate_infers_project_and_builds_prompt(client: TestClient) -> None:
-    res = client.post("/api/delegate", json={"task": "add label filtering to the search page"})
+    res = client.post(
+        "/api/delegate", json={"task": "add label filtering to the search page"}
+    )
     assert res.status_code == 200
     body = res.json()
     assert body["project"] == "spincd"  # inferred from "filter"/"search"
@@ -55,7 +57,9 @@ def test_delegate_infers_project_and_builds_prompt(client: TestClient) -> None:
 
 
 def test_delegate_respects_explicit_project(client: TestClient) -> None:
-    res = client.post("/api/delegate", json={"task": "do a thing", "project": "ai-digest"})
+    res = client.post(
+        "/api/delegate", json={"task": "do a thing", "project": "ai-digest"}
+    )
     assert res.status_code == 200
     assert res.json()["project"] == "ai-digest"
 
