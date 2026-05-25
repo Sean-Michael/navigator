@@ -29,7 +29,7 @@
   --bg-tint-c: rgba(143, 188, 187, 0.18);  /* teal blob */
   --ink: var(--polar-0);
   --ink-soft: var(--polar-3);
-  --ink-faint: #6b7484;
+  --ink-faint: #5e6573;  /* WCAG AA (≈5:1) on the off-white base */
   --hairline: rgba(46, 52, 64, 0.08);
   --hairline-strong: rgba(46, 52, 64, 0.14);
 
@@ -80,7 +80,7 @@
   --bg-tint-c: rgba(143, 188, 187, 0.20);
   --ink: #ECEFF4;
   --ink-soft: #C0C7D2;
-  --ink-faint: #8b94a3;
+  --ink-faint: #aab3c2;  /* WCAG AA (≈4.5:1) on Nord-dark base + glass panes */
   --hairline: rgba(255, 255, 255, 0.07);
   --hairline-strong: rgba(255, 255, 255, 0.13);
   --accent-soft: rgba(136, 192, 208, 0.16);

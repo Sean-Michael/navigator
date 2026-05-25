@@ -260,7 +260,7 @@ function App() {
       {showSpec && <SpecModal projectName={activeProject.name} content={spec} onClose={() => setShowSpec(false)} />}
       {toast && <Toast message={toast} />}
 
-      <Tweaks values={t} setTweak={setTweak} />
+      <Tweaks values={t} setTweak={setTweak} hidden={isReceded} />
     </>
   )
 }

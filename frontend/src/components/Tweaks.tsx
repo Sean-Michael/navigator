@@ -10,13 +10,13 @@ const ACCENT_OPTIONS: { value: TweakValues['accent']; color: string; label: stri
 ]
 
 const STYLE = `
-  .twk-fab{position:fixed;right:16px;bottom:16px;z-index:2147483645;width:40px;height:40px;
+  .twk-fab{position:fixed;right:16px;bottom:16px;z-index:15;width:40px;height:40px;
     display:grid;place-items:center;border:.5px solid rgba(255,255,255,.6);border-radius:12px;
     background:rgba(250,249,247,.78);color:#29261b;cursor:pointer;
     -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
     box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 8px 24px rgba(0,0,0,.16)}
   [data-theme="dark"] .twk-fab{background:rgba(46,52,64,.82);color:#ECEFF4;border-color:rgba(255,255,255,.12)}
-  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:16;width:280px;
     max-height:calc(100vh - 32px);display:flex;flex-direction:column;
     background:rgba(250,249,247,.86);color:#29261b;
     -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
@@ -89,8 +89,19 @@ function Seg<T extends string>({
   )
 }
 
-export function Tweaks({ values, setTweak }: { values: TweakValues; setTweak: <K extends keyof TweakValues>(k: K, v: TweakValues[K]) => void }) {
+export function Tweaks({
+  values,
+  setTweak,
+  hidden,
+}: {
+  values: TweakValues
+  setTweak: <K extends keyof TweakValues>(k: K, v: TweakValues[K]) => void
+  hidden?: boolean
+}) {
   const [open, setOpen] = useState(false)
+
+  // Stay out of the way while a modal / command palette is open.
+  if (hidden) return null
 
   if (!open) {
     return (
