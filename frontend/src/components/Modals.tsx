@@ -5,6 +5,8 @@ import { StatusPill } from './atoms'
 import type { Project } from '../data'
 import { buildPrompt, buildResumePrompt, guessSpecSections, inferProject, slugifyBranch } from '../lib/prompts'
 import type { ReadyItem } from '../lib/inbox'
+import { registerProject } from '../api'
+import type { RegisterResponse } from '../api'
 
 export function Modal({ onClose, children, wide }: { onClose: () => void; children: ReactNode; wide?: boolean }) {
   useEffect(() => {
@@ -438,5 +440,125 @@ export function Toast({ message }: { message: string }) {
         <span>{message}</span>
       </div>
     </div>
+  )
+}
+
+export function RegisterModal({
+  onClose,
+  onRegistered,
+}: {
+  onClose: () => void
+  onRegistered: (projectId: string) => void
+}) {
+  const [repo, setRepo] = useState('')
+  const [skills, setSkills] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<RegisterResponse | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const submit = async () => {
+    if (!repo.trim() || busy) return
+    setBusy(true)
+    setError(null)
+    try {
+      const skillList = skills.split(',').map((s) => s.trim()).filter(Boolean)
+      const res = await registerProject(repo.trim(), skillList)
+      setResult(res)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'registration failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Modal onClose={onClose} wide>
+      <div className="modal-head">
+        <div>
+          <h2 className="modal-title">Register a repo</h2>
+          <p className="modal-sub">
+            Adds the repo to the registry and generates its GitOps manifests — commit{' '}
+            <span style={{ fontFamily: 'var(--font-mono)' }}>navigator.yaml</span> to start tracking sessions.
+          </p>
+        </div>
+        <button className="close-btn" onClick={onClose}>
+          <Icon name="close" size={12} />
+        </button>
+      </div>
+
+      {!result ? (
+        <>
+          <div className="task-card">
+            <div className="task-row">
+              <div className="task-key">GitHub repo</div>
+              <div className="task-val">
+                <input
+                  ref={inputRef}
+                  className="reg-input"
+                  placeholder="owner/name or https://github.com/owner/name"
+                  value={repo}
+                  onChange={(e) => setRepo(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') void submit()
+                  }}
+                  spellCheck={false}
+                />
+              </div>
+            </div>
+            <div className="task-row">
+              <div className="task-key">Skills</div>
+              <div className="task-val">
+                <input
+                  className="reg-input"
+                  placeholder="optional, comma-separated (e.g. frontend-design, python-docs)"
+                  value={skills}
+                  onChange={(e) => setSkills(e.target.value)}
+                  spellCheck={false}
+                />
+              </div>
+            </div>
+          </div>
+          {error && <div className="reg-error">{error}</div>}
+          <div className="modal-foot">
+            <div className="foot-hint">Creates a spec-phase project. No code is cloned.</div>
+            <div className="foot-actions">
+              <button className="btn btn-ghost" onClick={onClose}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={() => void submit()} disabled={busy || !repo.trim()}>
+                {busy ? 'Registering…' : 'Register'}
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="section-head" style={{ margin: '2px 2px 8px' }}>
+            <div className="section-title">~/.navigator/registry.yaml</div>
+            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>append this entry</span>
+          </div>
+          <pre className="manifest-block">{result.manifests.registry_entry}</pre>
+          <div className="section-head" style={{ margin: '14px 2px 8px' }}>
+            <div className="section-title">{result.project.name}/navigator.yaml</div>
+            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>commit to the repo root</span>
+          </div>
+          <pre className="manifest-block">{result.manifests.navigator_yaml}</pre>
+          <div className="modal-foot">
+            <div className="foot-hint">
+              Registered <span style={{ fontFamily: 'var(--font-mono)' }}>{result.project.name}</span>.
+            </div>
+            <div className="foot-actions">
+              <button className="btn btn-primary" onClick={() => onRegistered(result.project.id)}>
+                Open project
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
   )
 }

@@ -4,13 +4,13 @@ import type { IconName } from './components/Icon'
 import { Overview } from './components/Overview'
 import { InboxView } from './components/Inbox'
 import { ProjectPortal } from './components/Portal'
-import { DelegationModal, ResumeModal, SpecModal, SpotlightInner, Toast } from './components/Modals'
+import { DelegationModal, RegisterModal, ResumeModal, SpecModal, SpotlightInner, Toast } from './components/Modals'
 import { Tweaks } from './components/Tweaks'
 import { TWEAK_DEFAULTS } from './lib/tweaks'
 import type { TweakValues } from './lib/tweaks'
 import type { Project } from './data'
 import { buildReadyItems, chipColorForStatus } from './lib/inbox'
-import { useNavData } from './navData-context'
+import { useNavData, useNavRefresh } from './navData-context'
 import * as api from './api'
 
 const TABS: { id: TabId; label: string; icon: IconName }[] = [
@@ -42,6 +42,7 @@ function loadTweaks(): TweakValues {
 
 function App() {
   const { projects: PROJECTS, readyTasks: READY_TASKS, spec } = useNavData()
+  const refresh = useNavRefresh()
   const [t, setTweaks] = useState<TweakValues>(loadTweaks)
   const setTweak = useCallback(<K extends keyof TweakValues>(key: K, value: TweakValues[K]) => {
     setTweaks((prev) => {
@@ -62,6 +63,7 @@ function App() {
   const [resume, setResume] = useState<string | null>(null)
   const [showSpec, setShowSpec] = useState(false)
   const [spotlight, setSpotlight] = useState(false)
+  const [register, setRegister] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   const showToast = (m: string) => {
@@ -119,7 +121,7 @@ function App() {
       (p.sessions[0] && p.sessions[0].outcome === 'in-progress'),
   ).length
 
-  const isReceded = spotlight || !!delegation || !!resume || showSpec
+  const isReceded = spotlight || !!delegation || !!resume || showSpec || register
 
   return (
     <>
@@ -189,6 +191,9 @@ function App() {
                   {p.name}
                 </button>
               ))}
+              <button className="project-chip project-chip--add" onClick={() => setRegister(true)} title="Register a repo">
+                + Add repo
+              </button>
             </div>
             <ProjectPortal
               project={activeProject}
@@ -257,6 +262,19 @@ function App() {
         />
       )}
       {showSpec && <SpecModal projectName={activeProject.name} content={spec} onClose={() => setShowSpec(false)} />}
+      {register && (
+        <RegisterModal
+          onClose={() => setRegister(false)}
+          onRegistered={(id) => {
+            setRegister(false)
+            void refresh().then(() => {
+              setActiveProjectId(id)
+              setTab('projects')
+              showToast(`Registered ${id}`)
+            })
+          }}
+        />
+      )}
       {toast && <Toast message={toast} />}
 
       <Tweaks values={t} setTweak={setTweak} hidden={isReceded} />

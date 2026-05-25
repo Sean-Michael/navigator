@@ -1,9 +1,34 @@
 import { useState } from 'react'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
-import { CIBadge, CoverageRing, DeployBadge, LangBar, MarkdownPreview, StatusPill } from './atoms'
-import type { Portfolio, Project } from '../data'
-import { useNavData } from '../navData-context'
+import { CIBadge, CoverageRing, DeployBadge, LangBar, MarkdownPreview } from './atoms'
+import type { Portfolio, Project, Status } from '../data'
+import { useNavData, useNavRefresh } from '../navData-context'
+import { updateStatus } from '../api'
+
+const STATUS_OPTIONS: Status[] = ['active', 'review', 'idle', 'stale', 'spec', 'blocked']
+
+function StatusSelect({ project }: { project: Project }) {
+  const refresh = useNavRefresh()
+  return (
+    <span className={`status-select pill is-${project.status}`}>
+      <span className="pill-dot" />
+      <select
+        value={project.status}
+        aria-label="Project status"
+        onChange={(e) => {
+          void updateStatus(project.id, e.target.value as Status).then(() => refresh())
+        }}
+      >
+        {STATUS_OPTIONS.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+    </span>
+  )
+}
 
 const PORTAL_TABS: { id: string; label: string; icon: IconName }[] = [
   { id: 'overview', label: 'Overview', icon: 'compass' },
@@ -68,7 +93,7 @@ export function ProjectPortal({ project, onResume, onDelegate, onOpenSpec, jumpT
         </div>
 
         <div className="portal-meta-row">
-          <StatusPill status={project.status} />
+          <StatusSelect project={project} />
           <CIBadge status={port.ci.status} />
           <span className="proj-branch">{project.branch}</span>
           <span style={{ fontSize: 11.5, color: 'var(--ink-faint)', fontFamily: 'var(--font-mono)' }}>

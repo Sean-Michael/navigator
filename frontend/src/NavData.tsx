@@ -1,22 +1,42 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { SEED } from './data'
+import type { NavData } from './data'
 import { fetchBootstrap } from './api'
 import { NavDataContext } from './navData-context'
-import type { NavDataContextValue } from './navData-context'
+import type { DataSource } from './navData-context'
 
 export function NavDataProvider({ children }: { children: ReactNode }) {
   // Start from the offline seed so the UI is instant, then upgrade to live
   // data from the backend. If the API is unreachable we stay on the seed.
-  const [value, setValue] = useState<NavDataContextValue>({ data: SEED, source: 'loading' })
+  const [data, setData] = useState<NavData>(SEED)
+  const [source, setSource] = useState<DataSource>('loading')
+
+  const refresh = useCallback(
+    () =>
+      fetchBootstrap()
+        .then((next) => {
+          setData(next)
+          setSource('live')
+        })
+        .catch(() => {
+          setSource((prev) => (prev === 'live' ? 'live' : 'seed'))
+        }),
+    [],
+  )
 
   useEffect(() => {
     const controller = new AbortController()
     fetchBootstrap(controller.signal)
-      .then((data) => setValue({ data, source: 'live' }))
-      .catch(() => setValue({ data: SEED, source: 'seed' }))
+      .then((next) => {
+        setData(next)
+        setSource('live')
+      })
+      .catch(() => setSource('seed'))
     return () => controller.abort()
   }, [])
 
-  return <NavDataContext.Provider value={value}>{children}</NavDataContext.Provider>
+  return (
+    <NavDataContext.Provider value={{ data, source, refresh }}>{children}</NavDataContext.Provider>
+  )
 }

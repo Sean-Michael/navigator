@@ -671,3 +671,75 @@
 @media (max-width: 640px) {
   .portfolio { grid-template-columns: 1fr; }
 }
+
+/* ---------- Project registration + status editing ---------- */
+.project-chip--add {
+  border: 1px dashed var(--hairline-strong);
+  color: var(--accent);
+  font-weight: 500;
+}
+.project-chip--add:hover { background: var(--accent-soft); }
+
+.reg-input {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+}
+[data-theme="dark"] .reg-input { background: rgba(255, 255, 255, 0.06); }
+.reg-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.reg-input::placeholder { color: var(--ink-faint); }
+
+.reg-error {
+  margin: 2px 2px 0;
+  font-size: 12.5px;
+  color: #8d3f47;
+}
+[data-theme="dark"] .reg-error { color: #d99096; }
+
+.manifest-block {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  color: var(--ink-soft);
+  background: rgba(46, 52, 64, 0.04);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 12px 14px;
+  max-height: 220px;
+  overflow: auto;
+}
+[data-theme="dark"] .manifest-block { background: rgba(0, 0, 0, 0.22); }
+
+/* status pill that doubles as a select */
+.status-select { padding-right: 6px; cursor: pointer; }
+.status-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 14px 0 0;
+  text-transform: capitalize;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 4px center, right 0px center;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+.status-select select:focus { outline: none; }
+.status-select select option { color: var(--ink); }
