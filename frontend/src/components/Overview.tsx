@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
-import { CIBadge, DeployBadge, StatusPill } from './atoms'
+import { CIBadge, StatusPill } from './atoms'
 import { NOW } from '../data'
 import type { Project } from '../data'
 import { deriveAttention } from '../lib/inbox'
@@ -66,62 +66,40 @@ export function Overview({
     return pct >= 0 ? { kind: 'is-up', label: `+${pct}%` } : { kind: 'is-down', label: `${pct}%` }
   }
 
-  const greeting = (() => {
-    const h = NOW.getHours()
-    if (h < 12) return 'Good morning'
-    if (h < 18) return 'Good afternoon'
-    return 'Good evening'
-  })()
-
   return (
     <div className="overview">
       <div className="greeting">
-        <h1>
-          {greeting}. <span className="quiet">Here's where you are.</span>
-        </h1>
         <div className="date">{NOW.toDateString()}</div>
       </div>
 
       <div className="kpi-strip">
         <div className="glass kpi">
-          <div className="kpi-label">
-            <Icon name="spark" size={11} /> Needs attention
-          </div>
+          <div className="kpi-label">Needs attention</div>
           <div className="kpi-value">
             {attention.length}
             <span className="unit">/ {projects.length}</span>
           </div>
-          <div className="kpi-trend">
-            {READY_TASKS.length} ready · {projects.length - attention.length} stable
-          </div>
+          <div className="kpi-trend">{READY_TASKS.length} ready</div>
         </div>
         <div className="glass kpi">
-          <div className="kpi-label">
-            <Icon name="git-commit" size={11} /> Commits / 7d
-          </div>
+          <div className="kpi-label">Commits / 7d</div>
           <div className="kpi-value">{STATS.commits7d}</div>
           <div className={`kpi-trend ${trend(STATS.commits7d, STATS.commits7dPrev).kind}`}>
-            {trend(STATS.commits7d, STATS.commits7dPrev).label} vs prior week
+            {trend(STATS.commits7d, STATS.commits7dPrev).label}
           </div>
         </div>
         <div className="glass kpi">
-          <div className="kpi-label">
-            <Icon name="session" size={11} /> Sessions / 7d
-          </div>
+          <div className="kpi-label">Sessions / 7d</div>
           <div className="kpi-value">{STATS.sessions7d}</div>
-          <div className={`kpi-trend ${trend(STATS.sessions7d, STATS.sessions7dPrev).kind}`}>
-            {STATS.prsMerged7d} PRs merged
-          </div>
+          <div className="kpi-trend">{STATS.prsMerged7d} PRs merged</div>
         </div>
         <div className="glass kpi">
-          <div className="kpi-label">
-            <Icon name="rocket" size={11} /> Deploys healthy
-          </div>
+          <div className="kpi-label">Deploys healthy</div>
           <div className="kpi-value">
             {STATS.deploysHealthy}
             <span className="unit">/ {STATS.deploysTotal}</span>
           </div>
-          <div className="kpi-trend">across {projects.length} projects</div>
+          <div className="kpi-trend">{projects.length} projects</div>
         </div>
       </div>
 
@@ -181,7 +159,7 @@ export function Overview({
                   <div className="mini-name" style={{ fontSize: 12.5 }}>{t.task}</div>
                   <div className="mini-meta">{t.project} · {t.estimated}</div>
                 </div>
-                <Icon name="back" size={11} style={{ color: 'var(--ink-faint)', transform: 'rotate(180deg)' }} />
+                <span className="mini-right">{t.estimated.includes('decision') ? 'decide' : 'delegate'}</span>
               </div>
             ))
           )}
@@ -189,9 +167,8 @@ export function Overview({
       </div>
 
       <div>
-        <div className="sh" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '6px 4px 12px' }}>
+        <div className="sh" style={{ margin: '6px 4px 12px' }}>
           <span className="sh-title">Portfolio</span>
-          <span style={{ fontSize: 11.5, color: 'var(--ink-faint)' }}>click any tile to open its portal</span>
         </div>
         <div className="portfolio">
           {projects.map((p: Project) => {
@@ -207,24 +184,15 @@ export function Overview({
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   <CIBadge status={port.ci.status} />
-                  {port.deploy.env !== 'not deployed' && <DeployBadge status={port.deploy.status} env={port.deploy.env} />}
                 </div>
                 <div className="tile-mini-stats">
                   <div className="tile-stat">
                     <span className="lbl">commits</span>
-                    <span className="val">
-                      {port.recentCommits.length}
-                      <span style={{ color: 'var(--ink-faint)', fontSize: 10, marginLeft: 3 }}>last 7d</span>
-                    </span>
+                    <span className="val">{port.recentCommits.length}</span>
                   </div>
                   <div className="tile-stat">
                     <span className="lbl">PRs</span>
-                    <span className="val">
-                      {p.openPRs}
-                      <span style={{ color: p.openPRs > 0 ? '#5b7c43' : 'var(--ink-faint)', fontSize: 10, marginLeft: 3 }}>
-                        {p.openPRs > 0 ? 'open' : 'none'}
-                      </span>
-                    </span>
+                    <span className="val">{p.openPRs}</span>
                   </div>
                   <div className="tile-stat">
                     <span className="lbl">sessions</span>

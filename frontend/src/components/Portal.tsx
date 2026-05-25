@@ -56,10 +56,10 @@ export function ProjectPortal({ project, onResume, onDelegate, onOpenSpec, jumpT
               </a>
             )}
             <button className="btn" onClick={onOpenSpec}>
-              <Icon name="spec" size={12} /> Spec
+              Spec
             </button>
             <button className="btn" onClick={() => onDelegate(project.id)}>
-              <Icon name="spark" size={12} /> New task
+              New task
             </button>
             <button className="btn btn-primary" onClick={() => onResume(project.id)}>
               <Icon name="play" size={12} /> Resume
@@ -70,11 +70,7 @@ export function ProjectPortal({ project, onResume, onDelegate, onOpenSpec, jumpT
         <div className="portal-meta-row">
           <StatusPill status={project.status} />
           <CIBadge status={port.ci.status} />
-          <DeployBadge status={port.deploy.status} env={port.deploy.env} />
-          <span className="proj-branch">
-            <Icon name="branch" size={11} />
-            {project.branch}
-          </span>
+          <span className="proj-branch">{project.branch}</span>
           <span style={{ fontSize: 11.5, color: 'var(--ink-faint)', fontFamily: 'var(--font-mono)' }}>
             {project.repoPath}
           </span>
@@ -84,7 +80,6 @@ export function ProjectPortal({ project, onResume, onDelegate, onOpenSpec, jumpT
       <div className="glass glass--sm portal-subnav" style={{ display: 'inline-flex', alignSelf: 'flex-start' }}>
         {PORTAL_TABS.map((t) => (
           <button key={t.id} className={`portal-sub-tab ${tab === t.id ? 'is-active' : ''}`} onClick={() => setTab(t.id)}>
-            <Icon name={t.icon} size={12} />
             {t.label}
             {t.id === 'sessions' && project.sessions.length > 0 && <span className="sub-count">{project.sessions.length}</span>}
             {t.id === 'artifacts' && port.artifacts.length > 0 && <span className="sub-count">{port.artifacts.length}</span>}

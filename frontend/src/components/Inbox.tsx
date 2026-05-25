@@ -179,12 +179,8 @@ function ProjectDetail({
           <div className="ctx-section">
             <div className="ctx-head">Spec preview · SPEC.md</div>
             <div className="ctx-card" style={{ fontSize: 13.5, color: 'var(--ink-soft)', lineHeight: 1.6 }}>
-              <p style={{ margin: '0 0 8px', fontWeight: 500, color: 'var(--ink)' }}>
-                Navigator — chart the course through the Warp.
-              </p>
               <p style={{ margin: 0 }}>
-                A personal GitOps control plane for solo AI-assisted development. ArgoCD is to Kubernetes what
-                Navigator is to your codebase…
+                A personal GitOps control plane for solo AI-assisted development.
               </p>
               <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--ink-faint)', fontFamily: 'var(--font-mono)' }}>
                 ~/repos/navigator/SPEC.md · 285 lines

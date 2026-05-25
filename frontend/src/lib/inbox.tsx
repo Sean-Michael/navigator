@@ -197,13 +197,12 @@ export const HERO: Record<AttentionKind, Hero> = {
     eyebrow: 'Needs review',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">has a PR waiting on you.</span>
+        <span className="proj">{p.name}</span> <span className="verb">PR #{prNum(p)} awaiting review</span>
       </>
     ),
     sub: (p) => (
       <>
-        PR #{prNum(p)} from <span style={{ fontFamily: 'var(--font-mono)' }}>{p.branch}</span> → main. Review on
-        GitHub — that's where the diff lives.
+        <span style={{ fontFamily: 'var(--font-mono)' }}>{p.branch}</span> → main. Review on GitHub.
       </>
     ),
   },
@@ -211,56 +210,46 @@ export const HERO: Record<AttentionKind, Hero> = {
     eyebrow: 'Blocked',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">stopped on an open question.</span>
+        <span className="proj">{p.name}</span> <span className="verb">blocked</span>
       </>
     ),
-    sub: () => (
-      <>
-        The last session bailed on a decision you haven't made. Unblocking usually means editing the spec, then
-        resuming.
-      </>
-    ),
+    sub: () => <>Last session stopped on an open decision. Edit the spec, then resume.</>,
   },
   stale: {
     eyebrow: 'Stale',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">hasn't moved in {p.lastTouched}.</span>
+        <span className="proj">{p.name}</span> <span className="verb">stale · {p.lastTouched}</span>
       </>
     ),
-    sub: () => <>Decide what to do next — pick it back up, or close the branch and reclaim the worktree.</>,
+    sub: () => <>No activity in a while. Pick it up, or prune the branch.</>,
   },
   spec: {
     eyebrow: 'Spec phase',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">is still on paper.</span>
+        <span className="proj">{p.name}</span> <span className="verb">spec phase</span>
       </>
     ),
-    sub: () => <>No commits yet. Iterate the spec, or hand off to a bootstrap session.</>,
+    sub: () => <>No commits yet.</>,
   },
   active: {
     eyebrow: 'In progress',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">— pick up where you left off.</span>
+        <span className="proj">{p.name}</span> <span className="verb">in progress</span>
       </>
     ),
-    sub: () => (
-      <>
-        Last session was in-progress. Resume the worktree with the reflection + open TODOs + relevant spec sections
-        injected.
-      </>
-    ),
+    sub: () => <>Resume the worktree — reflection, TODOs, and spec sections are injected.</>,
   },
   idle: {
     eyebrow: 'Stable',
     title: (p) => (
       <>
-        <span className="proj">{p.name}</span> <span className="verb">— nothing demands attention.</span>
+        <span className="proj">{p.name}</span> <span className="verb">stable</span>
       </>
     ),
-    sub: () => <>Pick a task from the queue, or describe a new one.</>,
+    sub: () => <>Nothing pending. Start a task from the queue.</>,
   },
 }
 

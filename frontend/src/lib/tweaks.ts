@@ -9,7 +9,7 @@ export interface TweakValues {
 export const TWEAK_DEFAULTS: TweakValues = {
   theme: 'light',
   accent: 'frost',
-  glassIntensity: 22,
-  showGrain: true,
+  glassIntensity: 12,
+  showGrain: false,
   defaultTab: 'overview',
 }

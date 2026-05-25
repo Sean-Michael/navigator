@@ -21,6 +21,30 @@ remove decoration until what's left is information.
 
 ---
 
+## Resolution (declutter pass — landed)
+
+F1–F5 below were addressed directly on `main` (the parallel worktree agents
+hit a session limit before running, so the work was done in one tree and
+verified visually via Playwright in both themes):
+
+- **F1** — Icon usage cut from **72 → ~40**: removed from KPI labels, top tabs,
+  portal subtabs, portal hero/branch, section actions, and the ready-queue
+  trailing chevron. Kept only meaningful ones (inbox status markers, primary
+  button, external-link, file-type).
+- **F2** — Flattened glass shadows from 5 layers (incl. double inset sheen) to
+  one subtle elevation; cut the specular `::before` opacity ~half; background
+  blobs `0.95 → 0.4`; grain default **off** and dimmed; default glass blur
+  `22 → 12px`.
+- **F3** — Removed the greeting, the "chart the course through the Warp" flavor,
+  and the "click any tile" helper; inbox heroes are now `name + terse state`
+  (e.g. "spincd · PR #14 awaiting review") with one-line factual subs.
+- **F4** — Dropped tile-stat suffixes ("last 7d", "open/none") and trimmed KPI
+  trailing phrases to a single short label.
+- **F5** — Portal hero and portfolio tiles no longer stack status + CI + deploy
+  + branch badges; kept the one or two that matter, rest as plain text.
+
+`F6`/`F7` remain open follow-ups.
+
 ## Open findings — the declutter pass
 
 ### F1 — Icon overload (72 `<Icon>` usages)

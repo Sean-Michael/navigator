@@ -45,15 +45,10 @@
   --glass-border-soft: rgba(255, 255, 255, 0.6);
   --glass-blur: 22px;
   --glass-shadow:
-    0 1px 0 0 rgba(255,255,255,0.9) inset,
-    0 -1px 0 0 rgba(46,52,64,0.04) inset,
     0 1px 2px rgba(46,52,64,0.04),
-    0 8px 24px -8px rgba(46,52,64,0.12),
-    0 24px 48px -20px rgba(46,52,64,0.16);
+    0 8px 24px -14px rgba(46,52,64,0.14);
   --glass-shadow-sm:
-    0 1px 0 0 rgba(255,255,255,0.8) inset,
-    0 1px 2px rgba(46,52,64,0.05),
-    0 4px 12px -4px rgba(46,52,64,0.10);
+    0 1px 2px rgba(46,52,64,0.05);
 
   /* Radii */
   --r-xs: 6px;
@@ -92,15 +87,10 @@
   --glass-border: rgba(255, 255, 255, 0.10);
   --glass-border-soft: rgba(255, 255, 255, 0.06);
   --glass-shadow:
-    0 1px 0 0 rgba(255,255,255,0.08) inset,
-    0 -1px 0 0 rgba(0,0,0,0.10) inset,
     0 1px 2px rgba(0,0,0,0.20),
-    0 8px 24px -8px rgba(0,0,0,0.35),
-    0 24px 48px -20px rgba(0,0,0,0.50);
+    0 8px 24px -14px rgba(0,0,0,0.40);
   --glass-shadow-sm:
-    0 1px 0 0 rgba(255,255,255,0.06) inset,
-    0 1px 2px rgba(0,0,0,0.18),
-    0 4px 12px -4px rgba(0,0,0,0.28);
+    0 1px 2px rgba(0,0,0,0.18);
 }
 
 [data-density="compact"] {
@@ -134,8 +124,8 @@ body {
 .bg-field > i {
   content: "";
   position: absolute;
-  filter: blur(80px);
-  opacity: 0.95;
+  filter: blur(90px);
+  opacity: 0.4;
   border-radius: 50%;
 }
 .bg-field::before {
@@ -160,7 +150,7 @@ body {
   background-image: radial-gradient(rgba(46,52,64,0.04) 1px, transparent 1px);
   background-size: 3px 3px;
   filter: none;
-  opacity: 0.35;
+  opacity: 0.15;
   border-radius: 0;
 }
 [data-theme="dark"] .bg-field > .grain {
@@ -188,14 +178,14 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 30%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 28%);
   pointer-events: none;
   mix-blend-mode: overlay;
-  opacity: 0.7;
+  opacity: 0.35;
 }
 [data-theme="dark"] .glass::before {
-  background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 35%);
-  opacity: 0.9;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 32%);
+  opacity: 0.45;
 }
 
 /* ---------- Layout ---------- */

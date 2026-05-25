@@ -146,7 +146,6 @@ function App() {
           <nav className="glass glass--sm v4-tabnav">
             {TABS.map((it) => (
               <button key={it.id} className={`v4-tab ${tab === it.id ? 'is-active' : ''}`} onClick={() => setTab(it.id)}>
-                <Icon name={it.icon} size={12} />
                 {it.label}
                 {it.id === 'inbox' && <span className="tab-badge">{attentionCount + READY_TASKS.length}</span>}
               </button>
