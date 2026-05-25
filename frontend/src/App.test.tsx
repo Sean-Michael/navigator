@@ -1,54 +1,53 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it } from 'vitest'
 import App from './App'
 
-function mockFetch(impl: typeof fetch) {
-  vi.stubGlobal('fetch', vi.fn(impl))
-}
-
 describe('App', () => {
-  it('renders the app title', () => {
-    mockFetch(async () => new Response('{}', { status: 200 }))
+  it('renders the Navigator brand', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Navigator' })).toBeInTheDocument()
+    expect(screen.getByText('Navigator')).toBeInTheDocument()
   })
 
-  it('shows "checking…" before the health response resolves', () => {
-    mockFetch(() => new Promise(() => {})) // never resolves
+  it('renders the three top-level tabs', () => {
     render(<App />)
-    expect(screen.getByText(/checking/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Overview/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Inbox/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Projects/ })).toBeInTheDocument()
   })
 
-  it('shows the backend status when the health check succeeds', async () => {
-    mockFetch(
-      async () =>
-        new Response(JSON.stringify({ status: 'ok' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-    )
+  it('shows the portfolio on the overview tab by default', () => {
     render(<App />)
-    await waitFor(() =>
-      expect(screen.getByText('Backend API: ok')).toBeInTheDocument(),
-    )
+    expect(screen.getByText('Portfolio')).toBeInTheDocument()
+    // a mock project appears as a portfolio tile heading
+    expect(screen.getByRole('heading', { name: 'spincd' })).toBeInTheDocument()
   })
 
-  it('calls the health endpoint', async () => {
-    const fetchMock = vi.fn(
-      async () => new Response(JSON.stringify({ status: 'ok' }), { status: 200 }),
-    )
-    vi.stubGlobal('fetch', fetchMock)
+  it('switches to the Inbox tab and renders the attention queue', async () => {
+    const user = userEvent.setup()
     render(<App />)
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/health'))
+    await user.click(screen.getByRole('button', { name: /Inbox/ }))
+    expect(screen.getByRole('heading', { name: 'Inbox' })).toBeInTheDocument()
+    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Ready to delegate')).toBeInTheDocument()
   })
 
-  it('shows "unreachable" when the request fails', async () => {
-    mockFetch(async () => {
-      throw new Error('network down')
-    })
+  it('switches to the Projects tab and renders the portal subnav', async () => {
+    const user = userEvent.setup()
     render(<App />)
-    await waitFor(() =>
-      expect(screen.getByText('Backend API: unreachable')).toBeInTheDocument(),
-    )
+    await user.click(screen.getByRole('button', { name: /Projects/ }))
+    expect(screen.getByRole('button', { name: /CI \/ CD/ })).toBeInTheDocument()
+  })
+
+  it('opens the command palette with Cmd+K', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.keyboard('{Meta>}k{/Meta}')
+    const palette = screen.getByPlaceholderText(/Describe a task, jump to a project/)
+    expect(palette).toBeInTheDocument()
+    // delegating a task opens the enriched preview modal
+    await user.type(palette, 'add label filtering to search')
+    await user.keyboard('{Enter}')
+    expect(within(screen.getByRole('heading', { name: 'Delegate task' })).queryByText('Delegate task')).toBeTruthy()
   })
 })

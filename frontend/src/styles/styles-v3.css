@@ -1,0 +1,243 @@
+/* ============================================================
+   Navigator v3 — adds Ready-to-delegate queue,
+   collapses repo block, modal Cmd+K recede.
+   Builds on styles.css + styles-v2.css.
+   ============================================================ */
+
+/* Row variant: ready-to-delegate (task headline > project meta) */
+.row-task .row-marker {
+  background: rgba(180,142,173,0.16);
+  color: #7a4f72;
+  border-color: rgba(180,142,173,0.30);
+}
+[data-theme="dark"] .row-task .row-marker { color: #d2b1cb; }
+
+.row-task .row-marker.is-decision {
+  background: rgba(235,203,139,0.22);
+  color: #8a6b1f;
+  border-color: rgba(235,203,139,0.40);
+}
+[data-theme="dark"] .row-task .row-marker.is-decision { color: #e3c787; }
+
+.row-task .row-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: normal;
+  line-height: 1.35;
+}
+.row-task .row-state {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 3px;
+}
+.row-task .row-state .em {
+  color: var(--frost-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+[data-theme="dark"] .row-task .row-state .em { color: #a8c2e0; }
+.row-task .row-meta { display: none; }
+
+.row-task .row-est {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  background: rgba(46,52,64,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .row-task .row-est { background: rgba(255,255,255,0.06); }
+
+/* selected task row uses plum accent */
+.row-task.is-selected { background: rgba(180,142,173,0.14); }
+.row-task.is-selected::before { background: var(--aurora-purple); }
+.row-task.is-decision.is-selected { background: rgba(235,203,139,0.18); }
+.row-task.is-decision.is-selected::before { background: var(--aurora-yellow); }
+
+/* Hint to drain: count strip on the group head */
+.inbox-group .group-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  background: rgba(46,52,64,0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+[data-theme="dark"] .inbox-group .group-count { background: rgba(255,255,255,0.06); }
+.inbox-group::after { /* override: include count inline */
+  margin-left: 8px;
+}
+
+/* ============================================================
+   DETAIL PANE — ready-to-delegate hero
+   ============================================================ */
+.hero-eyebrow.is-task { color: #7a4f72; }
+.hero-eyebrow.is-decision { color: #8a6b1f; }
+[data-theme="dark"] .hero-eyebrow.is-task { color: #d2b1cb; }
+[data-theme="dark"] .hero-eyebrow.is-decision { color: #e3c787; }
+
+.state-icon.is-task {
+  background: linear-gradient(160deg, #C8A7BE, #B48EAD);
+  color: white;
+}
+.state-icon.is-decision {
+  background: linear-gradient(160deg, #E0C57F, #B89A4E);
+  color: white;
+}
+
+.cta-primary.is-task {
+  background: linear-gradient(180deg, #A989A2, #8E6585);
+  border-color: rgba(142,101,133,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35),
+    0 6px 16px -4px rgba(180,142,173,0.5);
+}
+.cta-primary.is-decision {
+  background: linear-gradient(180deg, #D9B36E, #B0904F);
+  border-color: rgba(176,144,79,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35),
+    0 6px 16px -4px rgba(235,203,139,0.5);
+}
+
+/* Source card */
+.source-card {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.50);
+  border: 1px solid var(--hairline);
+}
+[data-theme="dark"] .source-card { background: rgba(67,76,94,0.4); }
+.source-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  background: rgba(94,129,172,0.14);
+  color: var(--frost-3);
+  flex-shrink: 0;
+}
+.source-icon.is-spec { background: rgba(180,142,173,0.18); color: #7a4f72; }
+.source-icon.is-session { background: rgba(143,188,187,0.20); color: #4a7878; }
+.source-icon.is-todo { background: rgba(235,203,139,0.22); color: #8a6b1f; }
+[data-theme="dark"] .source-icon.is-spec { color: #d2b1cb; }
+[data-theme="dark"] .source-icon.is-session { color: #95c3c2; }
+[data-theme="dark"] .source-icon.is-todo { color: #e3c787; }
+
+.source-label {
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+.source-detail { font-size: 13px; color: var(--ink); margin-top: 2px; line-height: 1.5; }
+.source-quote {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--hairline-strong);
+  padding: 4px 0 4px 12px;
+  margin-top: 8px;
+  font-style: italic;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* Suggested-next chip card (for stable detail pane) */
+.suggest-next {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: rgba(180,142,173,0.08);
+  border: 1px dashed rgba(180,142,173,0.30);
+  margin-top: 14px;
+}
+.suggest-icon-wrap {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: rgba(180,142,173,0.18);
+  color: #7a4f72;
+  display: grid; place-items: center;
+}
+.suggest-task-text { font-size: 13.5px; font-weight: 500; color: var(--ink); line-height: 1.35; }
+.suggest-meta { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+[data-theme="dark"] .suggest-icon-wrap { color: #d2b1cb; }
+
+/* ============================================================
+   Compact repo strip (replaces the big repo block in v3)
+   ============================================================ */
+.repo-strip {
+  margin-top: 36px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  border-top: 1px dashed var(--hairline-strong);
+  border-radius: 0;
+  flex-wrap: wrap;
+}
+.repo-strip-item { display: inline-flex; gap: 6px; align-items: center; }
+.repo-strip-item .lbl { color: var(--ink-faint); opacity: 0.7; }
+.repo-strip-item .val { color: var(--ink-soft); }
+.repo-strip-link {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  display: inline-flex; gap: 4px; align-items: center;
+}
+.repo-strip-link:hover { color: var(--accent); }
+
+/* ============================================================
+   Modal recede: when spotlight or modal is open, blur the app
+   ============================================================ */
+.v2-app.is-receded {
+  filter: blur(3px);
+  transform: scale(0.992);
+  transition: filter 220ms, transform 220ms;
+  pointer-events: none;
+}
+.v2-app { transition: filter 220ms, transform 220ms; }
+
+/* Larger, more focused Spotlight when in v3 */
+.spotlight-scrim.v3 {
+  background: rgba(46,52,64,0.40);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  backdrop-filter: blur(20px) saturate(120%);
+}
+[data-theme="dark"] .spotlight-scrim.v3 { background: rgba(0,0,0,0.65); }
+
+/* ============================================================
+   Footer hint extension
+   ============================================================ */
+.v2-footer-hints .hint .key-action {
+  color: var(--ink-soft);
+  margin-left: 2px;
+}
+
+/* hero-title tweaks */
+.hero-title-task {
+  font-size: 26px;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--ink);
+  text-wrap: pretty;
+  max-width: 620px;
+}
