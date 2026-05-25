@@ -78,3 +78,71 @@ def test_resume_builds_prompt(client: TestClient) -> None:
 
 def test_resume_unknown_project_404(client: TestClient) -> None:
     assert client.post("/api/projects/nope/resume").status_code == 404
+
+
+def test_update_status(client: TestClient) -> None:
+    res = client.patch("/api/projects/spincd", json={"status": "idle"})
+    assert res.status_code == 200
+    assert res.json()["status"] == "idle"
+    # persisted in the store
+    assert client.get("/api/projects/spincd").json()["status"] == "idle"
+
+
+def test_update_status_rejects_invalid(client: TestClient) -> None:
+    assert (
+        client.patch("/api/projects/spincd", json={"status": "bogus"}).status_code
+        == 422
+    )
+
+
+def test_update_status_unknown_project_404(client: TestClient) -> None:
+    assert (
+        client.patch("/api/projects/nope", json={"status": "idle"}).status_code == 404
+    )
+
+
+def test_register_from_github_url(client: TestClient) -> None:
+    res = client.post(
+        "/api/projects/register",
+        json={"repo": "https://github.com/sean/widget.git", "skills": ["python-docs"]},
+    )
+    assert res.status_code == 201
+    body = res.json()
+    assert body["project"]["id"] == "widget"
+    assert body["project"]["status"] == "spec"
+    assert "name: widget" in body["manifests"]["registry_entry"]
+    assert "project: widget" in body["manifests"]["navigator_yaml"]
+    assert "python-docs" in body["manifests"]["navigator_yaml"]
+    # now visible in the list + bootstrap
+    ids = {p["id"] for p in client.get("/api/projects").json()}
+    assert "widget" in ids
+    assert client.get("/api/projects/widget/portfolio").status_code == 200
+
+
+def test_register_accepts_owner_name(client: TestClient) -> None:
+    res = client.post("/api/projects/register", json={"repo": "acme/thing"})
+    assert res.status_code == 201
+    assert res.json()["project"]["id"] == "thing"
+
+
+def test_register_rejects_duplicate(client: TestClient) -> None:
+    assert (
+        client.post("/api/projects/register", json={"repo": "spincd"}).status_code
+        == 409
+    )
+
+
+def test_register_rejects_empty(client: TestClient) -> None:
+    assert client.post("/api/projects/register", json={"repo": "  "}).status_code == 422
+
+
+def test_registry_lists_all_repos(client: TestClient) -> None:
+    content = client.get("/api/registry").json()["content"]
+    assert "projects:" in content
+    assert "name: spincd" in content
+
+
+def test_project_manifest(client: TestClient) -> None:
+    content = client.get("/api/projects/spincd/manifest").json()["content"]
+    assert "project: spincd" in content
+    assert "sessions:" in content

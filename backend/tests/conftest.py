@@ -3,8 +3,15 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from app import store
 from app.config import Settings
 from app.main import create_app
+
+
+@pytest.fixture(autouse=True)
+def _reset_store() -> None:
+    """Project store is process-global; restore the seed before each test."""
+    store.reset()
 
 
 @pytest.fixture
