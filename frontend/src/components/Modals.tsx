@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { Icon } from './Icon'
 import { StatusPill } from './atoms'
 import type { Project } from '../data'
-import { SPEC_MD } from '../data'
 import { buildPrompt, buildResumePrompt, guessSpecSections, inferProject, slugifyBranch } from '../lib/prompts'
 import type { ReadyItem } from '../lib/inbox'
 
@@ -268,7 +267,15 @@ export function ResumeModal({
   )
 }
 
-export function SpecModal({ projectName, onClose }: { projectName: string; onClose: () => void }) {
+export function SpecModal({
+  projectName,
+  content,
+  onClose,
+}: {
+  projectName: string
+  content: string
+  onClose: () => void
+}) {
   return (
     <Modal onClose={onClose} wide>
       <div className="modal-head">
@@ -294,7 +301,7 @@ export function SpecModal({ projectName, onClose }: { projectName: string; onClo
           overflow: 'auto',
         }}
       >
-        {SPEC_MD}
+        {content}
       </div>
       <div className="modal-foot">
         <div className="foot-hint">

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
 import { CIBadge, CoverageRing, DeployBadge, LangBar, MarkdownPreview, StatusPill } from './atoms'
-import { PORTFOLIO, READY_TASKS, SPEC_MD } from '../data'
 import type { Portfolio, Project } from '../data'
+import { useNavData } from '../navData-context'
 
 const PORTAL_TABS: { id: string; label: string; icon: IconName }[] = [
   { id: 'overview', label: 'Overview', icon: 'compass' },
@@ -24,7 +24,8 @@ interface PortalProps {
 }
 
 export function ProjectPortal({ project, onResume, onDelegate, onOpenSpec, jumpToInbox }: PortalProps) {
-  const port = PORTFOLIO[project.id]
+  const { portfolio } = useNavData()
+  const port = portfolio[project.id]
   const [tab, setTab] = useState('overview')
   // Reset to the overview subtab when the selected project changes (adjust
   // state during render — the React-recommended alternative to an effect).
@@ -125,7 +126,8 @@ function PortalOverview({
   setTab: (t: string) => void
   jumpToInbox: () => void
 }) {
-  const readyForProj = READY_TASKS.filter((r) => r.project === project.id)
+  const { readyTasks } = useNavData()
+  const readyForProj = readyTasks.filter((r) => r.project === project.id)
   const last = project.sessions[0]
 
   return (
@@ -630,6 +632,7 @@ function PortalSessions({ project }: { project: Project }) {
 }
 
 function PortalSpec({ project }: { project: Project }) {
+  const { spec } = useNavData()
   return (
     <div className="portal-body no-side">
       <div className="portal-col-main">
@@ -650,7 +653,7 @@ function PortalSpec({ project }: { project: Project }) {
               </button>
             </div>
           </div>
-          <MarkdownPreview text={SPEC_MD} />
+          <MarkdownPreview text={spec} />
         </div>
       </div>
     </div>

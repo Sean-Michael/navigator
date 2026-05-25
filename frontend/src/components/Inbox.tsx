@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Icon } from './Icon'
 import { DelegationModal, ResumeModal, SpecModal, SpotlightInner, Toast } from './Modals'
-import { PROJECTS, READY_TASKS } from '../data'
 import type { Project } from '../data'
+import { useNavData } from '../navData-context'
+import * as api from '../api'
 import {
   buildReadyItems,
   deriveAttention,
@@ -98,6 +99,7 @@ function ProjectDetail({
   onDelegateTask: (t: ReadyItem) => void
   onJumpProject?: (id: string) => void
 }) {
+  const { readyTasks } = useNavData()
   const hero = HERO[item.kind]
   const last = item.sessions ? item.sessions[0] : null
   const useSuggest = item.kind === 'idle' && suggestedTask
@@ -139,7 +141,7 @@ function ProjectDetail({
             {useSuggest && (
               <div style={{ marginTop: 14, fontSize: 12, color: 'var(--ink-faint)' }}>
                 or browse <span style={{ color: 'var(--ink-soft)', fontWeight: 500 }}>Ready to delegate</span> (
-                {READY_TASKS.filter((t) => t.project === item.id).length} queued for {item.name})
+                {readyTasks.filter((t) => t.project === item.id).length} queued for {item.name})
               </div>
             )}
           </div>
@@ -311,10 +313,11 @@ function TaskDetail({
 }
 
 export function InboxView({ onJumpProject, hideFooter }: { onJumpProject?: (id: string) => void; hideFooter?: boolean }) {
-  const projectItems = useMemo(() => deriveAttention(PROJECTS), [])
+  const { projects: PROJECTS, readyTasks: READY_TASKS, spec } = useNavData()
+  const projectItems = useMemo(() => deriveAttention(PROJECTS), [PROJECTS])
   const attentionItems = useMemo(() => projectItems.filter((i) => i.priority < 10), [projectItems])
   const stableItems = useMemo(() => projectItems.filter((i) => i.priority >= 10), [projectItems])
-  const readyItems = useMemo(() => buildReadyItems(READY_TASKS, PROJECTS), [])
+  const readyItems = useMemo(() => buildReadyItems(READY_TASKS, PROJECTS), [READY_TASKS, PROJECTS])
   const flat = useMemo<InboxItem[]>(
     () => [...attentionItems, ...readyItems, ...stableItems],
     [attentionItems, readyItems, stableItems],
@@ -534,8 +537,12 @@ export function InboxView({ onJumpProject, hideFooter }: { onJumpProject?: (id: 
           defaultProject={delegation.defaultProject}
           onClose={() => setDelegation(null)}
           onLaunch={(p, br) => {
+            const taskText = delegation.task
             setDelegation(null)
-            showToast(`Launched ${p.name} on ${br}`)
+            api
+              .delegate(taskText, p.id)
+              .then((r) => showToast(`Launched ${p.name} on ${r.branch}`))
+              .catch(() => showToast(`Launched ${p.name} on ${br}`))
           }}
         />
       )}
@@ -545,11 +552,16 @@ export function InboxView({ onJumpProject, hideFooter }: { onJumpProject?: (id: 
           onClose={() => setResume(null)}
           onLaunch={(p) => {
             setResume(null)
-            showToast(`Resumed ${p.name}`)
+            api
+              .resume(p.id)
+              .then((r) => showToast(`Resumed ${p.name} on ${r.branch}`))
+              .catch(() => showToast(`Resumed ${p.name}`))
           }}
         />
       )}
-      {showSpec && specProject && <SpecModal projectName={specProject.name} onClose={() => setShowSpec(false)} />}
+      {showSpec && specProject && (
+        <SpecModal projectName={specProject.name} content={spec} onClose={() => setShowSpec(false)} />
+      )}
       {toast && <Toast message={toast} />}
     </>
   )

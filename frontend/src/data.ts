@@ -694,7 +694,18 @@ export const PORTFOLIO: Record<string, Portfolio> = {
   },
 }
 
-export const STATS = {
+export interface Stats {
+  commits7d: number
+  commits7dPrev: number
+  sessions7d: number
+  sessions7dPrev: number
+  prsMerged7d: number
+  prsMerged7dPrev: number
+  deploysHealthy: number
+  deploysTotal: number
+}
+
+export const STATS: Stats = {
   commits7d: 18,
   commits7dPrev: 12,
   sessions7d: 4,
@@ -703,4 +714,24 @@ export const STATS = {
   prsMerged7dPrev: 2,
   deploysHealthy: 3,
   deploysTotal: 4,
+}
+
+/** The full payload the app loads from the backend (or falls back to). */
+export interface NavData {
+  projects: Project[]
+  feed: FeedEntry[]
+  readyTasks: ReadyTask[]
+  portfolio: Record<string, Portfolio>
+  stats: Stats
+  spec: string
+}
+
+/** Offline seed — identical to the backend's. Used until /api/bootstrap loads. */
+export const SEED: NavData = {
+  projects: PROJECTS,
+  feed: FEED,
+  readyTasks: READY_TASKS,
+  portfolio: PORTFOLIO,
+  stats: STATS,
+  spec: SPEC_MD,
 }

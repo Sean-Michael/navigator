@@ -8,9 +8,10 @@ import { DelegationModal, ResumeModal, SpecModal, SpotlightInner, Toast } from '
 import { Tweaks } from './components/Tweaks'
 import { TWEAK_DEFAULTS } from './lib/tweaks'
 import type { TweakValues } from './lib/tweaks'
-import { PROJECTS, READY_TASKS } from './data'
 import type { Project } from './data'
 import { buildReadyItems, chipColorForStatus } from './lib/inbox'
+import { useNavData } from './navData-context'
+import * as api from './api'
 
 const TABS: { id: TabId; label: string; icon: IconName }[] = [
   { id: 'overview', label: 'Overview', icon: 'compass' },
@@ -40,6 +41,7 @@ function loadTweaks(): TweakValues {
 }
 
 function App() {
+  const { projects: PROJECTS, readyTasks: READY_TASKS, spec } = useNavData()
   const [t, setTweaks] = useState<TweakValues>(loadTweaks)
   const setTweak = useCallback(<K extends keyof TweakValues>(key: K, value: TweakValues[K]) => {
     setTweaks((prev) => {
@@ -233,8 +235,12 @@ function App() {
           defaultProject={delegation.defaultProject}
           onClose={() => setDelegation(null)}
           onLaunch={(p, br) => {
+            const taskText = delegation.task
             setDelegation(null)
-            showToast(`Launched ${p.name} on ${br}`)
+            api
+              .delegate(taskText, p.id)
+              .then((r) => showToast(`Launched ${p.name} on ${r.branch}`))
+              .catch(() => showToast(`Launched ${p.name} on ${br}`))
           }}
         />
       )}
@@ -244,11 +250,14 @@ function App() {
           onClose={() => setResume(null)}
           onLaunch={(p) => {
             setResume(null)
-            showToast(`Resumed ${p.name}`)
+            api
+              .resume(p.id)
+              .then((r) => showToast(`Resumed ${p.name} on ${r.branch}`))
+              .catch(() => showToast(`Resumed ${p.name}`))
           }}
         />
       )}
-      {showSpec && <SpecModal projectName={activeProject.name} onClose={() => setShowSpec(false)} />}
+      {showSpec && <SpecModal projectName={activeProject.name} content={spec} onClose={() => setShowSpec(false)} />}
       {toast && <Toast message={toast} />}
 
       <Tweaks values={t} setTweak={setTweak} />

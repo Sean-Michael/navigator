@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.api import router as api_router
 from app.config import Settings, get_settings
 
 
@@ -22,6 +23,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    app.include_router(api_router)
 
     # Serve the built frontend when a static dir is configured and present.
     # In development this is left unset and Vite serves the UI on :5173.

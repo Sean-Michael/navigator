@@ -2,10 +2,11 @@ import { useMemo } from 'react'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
 import { CIBadge, DeployBadge, StatusPill } from './atoms'
-import { NOW, PORTFOLIO, PROJECTS, READY_TASKS, STATS } from '../data'
+import { NOW } from '../data'
 import type { Project } from '../data'
 import { deriveAttention } from '../lib/inbox'
 import type { AttentionKind } from '../lib/inbox'
+import { useNavData } from '../navData-context'
 
 function miniIconForKind(k: string): IconName {
   return (
@@ -45,7 +46,7 @@ export function Overview({
   onOpenProject: (id: string) => void
   onJumpToInbox: () => void
 }) {
-  const projects = PROJECTS
+  const { projects, portfolio: PORTFOLIO, readyTasks: READY_TASKS, stats: STATS } = useNavData()
   const attention = projects.filter((p) => {
     const last = p.sessions[0]
     return (
